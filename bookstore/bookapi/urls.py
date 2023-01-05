@@ -3,6 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    path('books/', views.BookList.as_view()),
+    path('books/', views.book_list),
 
 ]
