@@ -5,60 +5,27 @@ from django.db import models
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
-    author = models.CharField(max_length=255)
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-
-    def __str__(self):
-        return self.title
-    
-    class Meta:
-        indexes = [
-            models.Index(fields=['price']),
-        ]
-
-class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    reviewer = models.CharField(max_length=255)
-    comment = models.TextField()
-
-    def __str__(self):
-        return self.comment
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['book']),
-        ]
+    author = models.ForeignKey('Author', on_delete=models.CASCADE)
+    publication_year = models.IntegerField(null=True, blank=True)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    genre = models.CharField(max_length=255, default='No genre specified')
+    isbn = models.CharField(max_length=13, default='No ISBN specified')
+    description = models.TextField(default='No description available')
+    cover = models.ImageField(upload_to='covers', blank=True, null=True)
 
 class Author(models.Model):
     name = models.CharField(max_length=255)
-    books = models.ManyToManyField(Book, through='AuthorBook'  , related_name='author_books')
+    bio = models.TextField()
+    website = models.URLField()
 
-    def __str__(self):
-        return self.name
+class Review(models.Model):
+    book = models.ForeignKey('Book', on_delete=models.CASCADE)
+    text = models.TextField()
+    reviewer = models.CharField(max_length=255)
+    rating = models.IntegerField()
 
-    class Meta:
-        indexes = [
-            models.Index(fields=['name']),
-        ]
-
-
-class AuthorBook(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='author_name')
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='author_book')
-
-    def __str__(self):
-        return f'{self.author} - {self.book}'
-
-
-    class Meta:
-        indexes = [
-            models.Index(fields=['author']),
-            models.Index(fields=['book']),
-        ]
-
-
-
-
-
-
-
+class User(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    password = models.CharField(max_length=255)
+    purchase_history = models.ManyToManyField(Book)
